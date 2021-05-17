@@ -1,8 +1,10 @@
+import { connect } from "react-redux";
+import { actions } from "../../redux/actions";
 import PropTypes from "prop-types";
 import { filterWrapper, filterLabel } from "./Filter.module.css";
 
 const Filter = (props) => {
-  const { onInput } = props;
+  const { value, changeFilter } = props;
   return (
     <div className={filterWrapper}>
       <label className={filterLabel} htmlFor="filter">
@@ -10,7 +12,8 @@ const Filter = (props) => {
       </label>
       <input
         id="filter"
-        onInput={(e) => onInput(e.target.value)}
+        onInput={(e) => changeFilter(e.target.value)}
+        value={value}
         type="text"
       ></input>
     </div>
@@ -18,7 +21,13 @@ const Filter = (props) => {
 };
 
 Filter.propTypes = {
-  onInput: PropTypes.func.isRequired,
+  changeFilter: PropTypes.func.isRequired,
 };
 
-export default Filter;
+const mapStateToProps = ({ filter }) => ({ value: filter });
+
+const mapDispatchToProps = (dispatch) => ({
+  changeFilter: (value) => dispatch(actions.changeFilter(value)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Filter);

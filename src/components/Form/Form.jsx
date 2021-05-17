@@ -1,5 +1,7 @@
 import PropTypes from "prop-types";
 import { Component } from "react";
+import { connect } from "react-redux";
+import { actions } from "../../redux/actions";
 import { form, label, input, button } from "./Form.module.css";
 
 class Form extends Component {
@@ -10,9 +12,19 @@ class Form extends Component {
   getContactData = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   };
+  saveNewContact = (e, name, number) => {
+    const { contacts, addContact } = this.props;
+
+    e.preventDefault();
+    contacts.some((item) => item.name === name)
+      ? alert(`${name} is already in contacts`)
+      : addContact(name, number);
+
+    e.currentTarget.reset();
+  };
 
   static propTypes = {
-    onSubmit: PropTypes.func.isRequired,
+    addContact: PropTypes.func.isRequired,
   };
 
   render() {
@@ -20,7 +32,7 @@ class Form extends Component {
       <form
         className={form}
         onSubmit={(e) =>
-          this.props.onSubmit(e, this.state.name, this.state.number)
+          this.saveNewContact(e, this.state.name, this.state.number)
         }
       >
         <label className={label}>
@@ -56,4 +68,12 @@ class Form extends Component {
   }
 }
 
-export default Form;
+const mapStateToProps = ({ items }) => ({
+  contacts: items,
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  addContact: (name, number) => dispatch(actions.saveNewContact(name, number)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Form);
